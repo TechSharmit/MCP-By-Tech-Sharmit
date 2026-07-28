@@ -1,0 +1,86 @@
+# =======================================================
+# 📌 Topic: MCP04 - Tool with Input Arguments (add function)
+# =======================================================
+#
+# 💬 Quick Question:
+#    In the previous example, what did we pass as "arguments"
+#    when calling the hello tool, since it needed no input?
+#    👉 Share your short answer in the comments!
+#
+#   
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+# Import FastMCP - this is the tool that helps us build an MCP server easily
+from mcp.server.fastmcp import FastMCP
+
+# Create a server and give it a name
+mcp = FastMCP("MathServer")
+
+# This tool now takes INPUT (a and b) instead of taking nothing
+# "a: int" and "b: int" mean both inputs must be whole numbers
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    """Adds two numbers and returns the result."""
+    # This is the actual calculation the tool performs
+    return a + b
+
+# Run the server, but only when this file is run directly
+if __name__ == "__main__":
+    mcp.run()
+
+# =======================================================
+# 📌 Topic: MCP04 - Tool with Input Arguments (add function)
+# =======================================================
+#
+# 💬 Quick Question:
+#    In the previous example, what did we pass as "arguments"
+#    when calling the hello tool, since it needed no input?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    # Tell the client HOW to start the server
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP04-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            # Handshake step - connect to the server
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # ---- NEW PART: Calling a tool WITH input arguments ----
+
+            # This time, arguments is not empty - we pass "a" and "b"
+            # These must match the parameter names in the server's add() function
+            result = await session.call_tool("add", arguments={"a": 5, "b": 15})
+
+            print("Tool called successfully!")
+            print("Result of add(5, 15):", result.content[0].text)
+
+
+            
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
