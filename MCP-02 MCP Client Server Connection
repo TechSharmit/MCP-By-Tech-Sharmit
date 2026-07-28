@@ -1,0 +1,64 @@
+# asyncio lets Python do things "asynchronously"
+# (needed because talking to a server takes time, and we don't want the program to freeze while waiting)
+import asyncio
+
+# These are the main MCP building blocks we need for a client
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+# We define our main logic inside an "async function"
+# because connecting and talking to a server needs async operations
+async def main():
+
+    # This tells the client HOW to start the server
+    # command="python" means: run it using the python command
+    # args=["server.py"] means: run the file called server.py
+    server_params = StdioServerParameters(
+        command="python",
+        args=["server.py"],
+    )
+
+    # This line actually STARTS the server in the background
+    # and opens a communication channel (read = receive messages, write = send messages)
+    async with stdio_client(server_params) as (read, write):
+
+        # ClientSession is like a "phone call" between client and server
+        # using the read/write channel we just opened
+        async with ClientSession(read, write) as session:
+
+            # This is the HANDSHAKE step
+            # Client says "hi, I want to talk" and server replies "I'm ready"
+            await session.initialize()
+
+            # If we reach this line, it means the connection was successful!
+            print("Connection successful! The client and server can now talk to each other.")
+
+
+# This makes sure the code only runs when we execute this file directly
+if __name__ == "__main__":
+    # asyncio.run() is needed to actually start our async function "main()"
+    asyncio.run(main())
+
+# Import FastMCP - this is the tool that helps us build an MCP server easily
+from mcp.server.fastmcp import FastMCP
+
+# Create a server and give it a name
+# This name is just a label so we can identify our server
+
+mcp = FastMCP("MyFirstServer")
+
+# This special line (@mcp.tool()) tells MCP:
+# "Hey, the function below this is a TOOL that AI can call"
+
+@mcp.tool()
+def hello() -> str:
+    """This is a description of the tool. AI reads this to understand what the tool does."""
+    # This is the actual work the tool does
+    # Right now it just returns a simple text message
+    return "Hello! This message is coming from the MCP server."
+
+# This part runs the server, but ONLY when we run this file directly
+# (not when it's imported somewhere else)
+if __name__ == "__main__":
+    mcp.run()
