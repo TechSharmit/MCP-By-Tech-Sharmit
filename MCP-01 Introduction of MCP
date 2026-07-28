@@ -1,0 +1,12 @@
+What is MCP? 
+MCP (Model Context Protocol) is an open standard that allows Al models (like ChatGPT, Claude, Gemini, 
+etc.) to securely connect with external tools, applications, databases, and APIs. 
+One-line Definition 
+MCP is like a USB-C port for Al. 
+Just as USB-C lets different devices connect easily, MCP lets Al connect with different tools using one 
+common standard. 
+Why was MCP created? 
+Without MCP: 
+• Every Al tool needs a different integration. 
+• Developers write custom code for each Al model. 
+• Integration becomes difficult and expensive. 
