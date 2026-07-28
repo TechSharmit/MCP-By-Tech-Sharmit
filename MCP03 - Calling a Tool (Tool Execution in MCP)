@@ -1,0 +1,84 @@
+# =======================================================
+# 📌 Topic: MCP03 - Calling a Tool (Tool Execution in MCP)
+# =======================================================
+#
+# 💬 Quick Question:
+#    What is the name of the MCP method used to run a tool
+#    from the client side?
+#    👉 Share your short answer in the comments!
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+# Import FastMCP - this is the tool that helps us build an MCP server easily
+from mcp.server.fastmcp import FastMCP
+
+# Create a server and give it a name
+mcp = FastMCP("MyFirstServer")
+
+# This tells MCP: "the function below is a TOOL that AI can call"
+@mcp.tool()
+def hello() -> str:
+    """This is a description of the tool. AI reads this to understand what the tool does."""
+    return "Hello! This message is coming from the MCP server."
+
+# Run the server, but only when this file is run directly
+if __name__ == "__main__":
+    mcp.run()
+# =======================================================
+# 📌 Topic: MCP03 - Calling a Tool (Tool Execution in MCP)
+# =======================================================
+#
+# 💬 Quick Question:
+#    What is the name of the MCP method used to run a tool
+#    from the client side?
+#    👉 Share your short answer in the comments!
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+# =======================================================
+
+# asyncio lets Python do things "asynchronously"
+# (needed because talking to a server takes time, and we don't want the program to freeze while waiting)
+import asyncio
+
+# These are the main MCP building blocks we need for a client
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    # Tell the client HOW to start the server
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP03-server.py"],
+    )
+
+    # Start the server and open a communication channel
+    async with stdio_client(server_params) as (read, write):
+
+        async with ClientSession(read, write) as session:
+
+            # Handshake step - connect to the server
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # ---- Actually calling the tool ----
+
+            # This tells the server: "please run the tool named 'hello'"
+            result = await session.call_tool("hello", arguments={})
+
+            # The server sends back a response
+            print("Tool called successfully!")
+            print("Result from server:", result.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
