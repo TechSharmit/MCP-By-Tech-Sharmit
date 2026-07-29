@@ -1,0 +1,100 @@
+# =======================================================
+# 📌 Topic: MCP05 - Multiple Tools in One Server
+# =======================================================
+#
+# 💬 Quick Question:
+# #  What must the dictionary keys (like "a" and "b") match
+#    with, when calling a tool that needs input?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("MathServer")
+
+# ---- Tool 1: Add ----
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    """Adds two numbers and returns the result."""
+    return a + b
+
+# ---- Tool 2: Subtract ----
+@mcp.tool()
+def subtract(a: int, b: int) -> int:
+    """Subtracts b from a and returns the result."""
+    return a - b
+
+# ---- Tool 3: Multiply ----
+@mcp.tool()
+def multiply(a: int, b: int) -> int:
+    """Multiplies two numbers and returns the result."""
+    return a * b
+
+if __name__ == "__main__":
+    mcp.run()
+
+# =======================================================
+# 📌 Topic: MCP05 - Multiple Tools in One Server
+# =======================================================
+#
+# 💬 Quick Question:
+#    What must the dictionary keys (like "a" and "b") match
+#    with, when calling a tool that needs input?   
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP05-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # ---- NEW PART: Discovering all tools on the server ----
+
+            # This asks the server: "what tools do you have?"
+            # instead of us already knowing their names in advance
+            tools_response = await session.list_tools()
+
+            print("Tools available on this server:")
+            for tool in tools_response.tools:
+                print(f" - {tool.name}: {tool.description}")
+            print()
+
+            # ---- Now calling each tool one by one ----
+
+            add_result = await session.call_tool("add", arguments={"a": 10, "b": 5})
+            print("add(10, 5) =", add_result.content[0].text)
+
+            sub_result = await session.call_tool("subtract", arguments={"a": 10, "b": 5})
+            print("subtract(10, 5) =", sub_result.content[0].text)
+
+            mul_result = await session.call_tool("multiply", arguments={"a": 10, "b": 5})
+            print("multiply(10, 5) =", mul_result.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
