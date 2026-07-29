@@ -1,0 +1,102 @@
+# =======================================================
+# 📌 Topic: MCP07 - Resources (Data that AI can read)
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python type hint do we add to a parameter to make
+#    it optional in an MCP tool?
+#    👉 Share your short answer in the comments!
+#
+#    ✅ Answer: A default value, like middle: str = ""
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("ResourceServer")
+
+# ---- Resource 1: A FIXED resource (no variables in the URL) ----
+# This always returns the same content, like a static page
+@mcp.resource("info://about")
+def get_about_info() -> str:
+    """Returns basic information about this server."""
+    return "This is a demo MCP server created for learning purposes."
+
+# ---- Resource 2: A DYNAMIC resource (uses a variable in the URL) ----
+# The {username} part is a placeholder - it changes based on what is requested
+@mcp.resource("profile://{username}")
+def get_profile(username: str) -> str:
+    """Returns a fake profile summary for the given username."""
+    return f"Profile for '{username}': Status = Active, Role = Learner"
+
+# We can still have a normal tool alongside resources in the same server
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    """Adds two numbers and returns the result."""
+    return a + b
+
+if __name__ == "__main__":
+    mcp.run()
+
+# =======================================================
+# 📌 Topic: MCP07 - Resources (Data that AI can read)
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python type hint do we add to a parameter to make
+#    it optional in an MCP tool?
+#    👉 Share your short answer in the comments!
+#
+#    ✅ Answer: A default value, like middle: str = ""
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP07-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # ---- NEW PART: Reading resources (not calling tools) ----
+
+            # Reading the FIXED resource - notice we use read_resource(), not call_tool()
+            about_result = await session.read_resource("info://about")
+            print("info://about ->", about_result.contents[0].text)
+
+            # Reading the DYNAMIC resource - we plug in a value where {username} was
+            profile_result = await session.read_resource("profile://rohan123")
+            print("profile://rohan123 ->", profile_result.contents[0].text)
+
+            # We can also list all resources the server has, similar to list_tools()
+            resources_response = await session.list_resources()
+            print("\nStatic resources available:")
+            for res in resources_response.resources:
+                print(f" - {res.uri}: {res.name}")
+
+            # A normal tool call still works exactly the same way as before
+            add_result = await session.call_tool("add", arguments={"a": 3, "b": 4})
+            print("\nadd(3, 4) =", add_result.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
