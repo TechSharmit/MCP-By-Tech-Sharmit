@@ -1,0 +1,41 @@
+📚 Resource in MCP (Model Context Protocol)
+🎯 What is a Resource?
+
+A Resource in MCP is readable data that an AI model can access from an MCP server.
+
+Think of a resource as a file, document, database record, log, or any information source that the AI can read when it needs context.
+
+Simple Definition:
+
+A Resource is information exposed by an MCP server for AI to read.
+
+Unlike tools, resources do not perform actions. They simply provide data.
+
+
+🤔 Why Do We Need Resources?
+
+AI models have limited built-in knowledge about your private or current data.
+
+Resources allow an AI to read information like:
+
+Documentation
+PDFs
+Configuration files
+Source code
+Logs
+Database records
+API specifications
+Project notes
+
+Instead of guessing, the AI reads the actual data.
+
+🧠 Core Idea
+
+A Resource is:
+
+Read-only
+Structured or unstructured data
+Shared by the MCP Server
+Used to give the AI additional context
+
+The AI reads it but doesn't execute it.
