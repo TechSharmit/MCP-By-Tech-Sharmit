@@ -1,0 +1,75 @@
+# =======================================================
+# 📌 Topic: MCP09 - A Tool that Reads a Real File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What method lists DYNAMIC resource templates
+#    (URIs with placeholders)?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("FileToolServer")
+
+@mcp.tool()
+def read_file(filename: str) -> str:
+    """Reads and returns the content of a text file."""
+    try:
+        # Python basics: open() opens a file, "r" means read mode
+        with open(filename, "r") as f:
+            content = f.read()
+        return content
+    except FileNotFoundError:
+        return f"Error: File '{filename}' was not found."
+
+if __name__ == "__main__":
+    mcp.run()
+# =======================================================
+# 📌 Topic: MCP09 - A Tool that Reads a Real File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What method lists DYNAMIC resource templates
+#    (URIs with placeholders)?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP09-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            result = await session.call_tool(
+                "read_file", arguments={"filename": "sample.txt"}
+            )
+            print("File content:\n", result.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
