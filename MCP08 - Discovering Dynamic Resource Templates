@@ -1,0 +1,91 @@
+# =======================================================
+# 📌 Topic: MCP08 - Discovering Dynamic Resource Templates
+# =======================================================
+#
+# 💬 Quick Question:
+#    What method lists only STATIC resources (fixed URIs)?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP08-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            resources_response = await session.list_resources()
+            print("Static resources available:")
+            for res in resources_response.resources:
+                print(f" - {res.uri}: {res.name}")
+
+            templates_response = await session.list_resource_templates()
+            print("\nDynamic resource templates available:")
+            for template in templates_response.resourceTemplates:
+                print(f" - {template.uriTemplate}: {template.name}")
+
+            print()
+            
+            profile_result = await session.read_resource("profile://rohan123")
+            print("profile://rohan123 ->", profile_result.contents[0].text)
+
+            order_result = await session.read_resource("order://ORD5001")
+            print("order://ORD5001 ->", order_result.contents[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+# =======================================================
+# 📌 Topic: MCP08 - Discovering Dynamic Resource Templates
+# =======================================================
+#
+# 💬 Quick Question:
+#    What method lists only STATIC resources (fixed URIs)?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("TemplateDemoServer")
+
+@mcp.resource("info://about")
+def get_about_info() -> str:
+    """Returns basic information about this server."""
+    return "This server demonstrates static vs dynamic resources."
+
+@mcp.resource("profile://{username}")
+def get_profile(username: str) -> str:
+    """Returns a fake profile summary for the given username."""
+    return f"Profile for '{username}': Status = Active, Role = Learner"
+
+@mcp.resource("order://{order_id}")
+def get_order(order_id: str) -> str:
+    """Returns fake order details for the given order id."""
+    return f"Order #{order_id}: Status = Shipped"
+
+if __name__ == "__main__":
+    mcp.run()
