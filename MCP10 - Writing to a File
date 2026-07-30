@@ -1,0 +1,78 @@
+# =======================================================
+# 📌 Topic: MCP10 - Writing to a File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python function do we use to read a file's content?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("FileWriteServer")
+
+# This tool writes content to a file.
+# "w" mode = write mode - creates the file if it doesn't exist,
+# and OVERWRITES it completely if it already exists.
+@mcp.tool()
+def write_file(filename: str, content: str) -> str:
+    """Writes content to a file. Creates the file if it doesn't exist, overwrites if it does."""
+    try:
+        with open(filename, "w") as f:
+            f.write(content)
+        return f"Successfully wrote to '{filename}'."
+    except Exception as e:
+        return f"Error writing file: {str(e)}"
+
+if __name__ == "__main__":
+    mcp.run()
+
+# =======================================================
+# 📌 Topic: MCP10 - Writing to a File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python function do we use to read a file's content?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP10-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # Writing content to a new file called notes.txt
+            result = await session.call_tool(
+                "write_file",
+                arguments={"filename": "notes.txt", "content": "This is my first line.(Overwritten)"},
+            )
+            print(result.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
