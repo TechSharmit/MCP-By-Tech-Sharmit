@@ -1,0 +1,81 @@
+# =======================================================
+# 📌 Topic: MCP11 - Appending to a File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What file mode did we use in MCP10 to write to a file,
+#    which OVERWRITES existing content?
+#    👉 Share your short answer in the comments!
+#
+
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("FileAppendServer")
+
+# This tool ADDS content to the end of a file, without deleting
+# what was already there. "a" mode = append mode.
+@mcp.tool()
+def append_file(filename: str, content: str) -> str:
+    """Appends content to the end of a file, keeping existing content intact."""
+    try:
+        with open(filename, "a") as f:
+            f.write(content + "\n")
+        return f"Successfully appended to '{filename}'."
+    except Exception as e:
+        return f"Error appending to file: {str(e)}"
+
+if __name__ == "__main__":
+    mcp.run()
+
+# =======================================================
+# 📌 Topic: MCP11 - Appending to a File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What file mode did we use in MCP10 to write to a file,
+#    which OVERWRITES existing content?
+#    👉 Share your short answer in the comments!
+
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP11-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # Adding a new line to notes.txt (the file we created in MCP10)
+            # without erasing what was already written in it
+            result = await session.call_tool(
+                "append_file",
+                arguments={"filename": "notes.txt", "content": "This is my second line."},
+            )
+            print(result.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
