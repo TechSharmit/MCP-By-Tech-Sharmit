@@ -1,0 +1,75 @@
+# =======================================================
+# 📌 Topic: MCP13 - Deleting a File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python function did we use in MCP12 to get the
+#    list of files inside a folder?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import os
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("FileDeleteServer")
+
+# This tool deletes a file, if it exists.
+# os.remove() is a Python function that permanently deletes a file.
+@mcp.tool()
+def delete_file(filename: str) -> str:
+    """Deletes the given file, if it exists."""
+    try:
+        os.remove(filename)
+        return f"Successfully deleted '{filename}'."
+    except FileNotFoundError:
+        return f"Error: File '{filename}' was not found, nothing to delete."
+
+if __name__ == "__main__":
+    mcp.run()
+# =======================================================
+# 📌 Topic: MCP13 - Deleting a File
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python function did we use in MCP12 to get the
+#    list of files inside a folder?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP13-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # Deleting notes.txt (the file we created in MCP10/MCP11)
+            result = await session.call_tool("delete_file", arguments={"filename": "notes.txt"})
+            print(result.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
