@@ -1,0 +1,105 @@
+# =======================================================
+# 📌 Topic: MCP14 - Proper MCP Error Handling (isError flag)
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python function is used to permanently delete a file?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
+
+mcp = FastMCP("ProperErrorServer")
+
+# ---- Method 1: Raising ToolError ----
+# When we RAISE this special error, MCP automatically marks
+# the result as isError=True on the protocol level.
+# This is DIFFERENT from just returning a string - the client
+# can now check result.isError to know for sure it failed.
+
+@mcp.tool()
+
+def divide(a: float, b: float) -> str:
+    """Divides a by b. Raises a proper MCP error if b is zero."""
+    if b == 0:
+        # This is the CORRECT way to signal an error in MCP
+        raise ToolError("Cannot divide by zero.")
+    return f"Result: {a / b}"
+
+# ---- Method 2: Another example, for comparison ----
+@mcp.tool()
+def square_root(number: float) -> str:
+    """Returns the square root of a number. Raises an error for negative numbers."""
+    if number < 0:
+        raise ToolError("Cannot calculate square root of a negative number.")
+    return f"Result: {number ** 0.5}"
+
+if __name__ == "__main__":
+    mcp.run()
+
+
+# =======================================================
+# 📌 Topic: MCP14 - Proper MCP Error Handling (isError flag)
+# =======================================================
+#
+# 💬 Quick Question:
+#    What Python function is used to permanently delete a file?
+#    👉 Share your short answer in the comments!
+#
+#
+# 🎓 Expand Your Tech Knowledge! 🎓
+# Check out #TechSharmitDigitalCourseBook - featuring thousands of
+# tutorials available in Hindi and English.
+# https://docs.google.com/spreadsheets/d/1iBvyN-LXWEk8gwk-70dIr-CzrZuKXGqZ0d5dQh64osQ/edit?usp=sharing
+# =======================================================
+
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+
+async def main():
+
+    server_params = StdioServerParameters(
+        command="python",
+        args=["MCP14-server.py"],
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+            print("Connection successful!\n")
+
+            # ---- Successful case ----
+            result1 = await session.call_tool("divide", arguments={"a": 10, "b": 2})
+            # result.isError tells us clearly: did this call succeed or fail?
+            print("divide(10, 2) -> isError:", result1.isError)
+            print("Content:", result1.content[0].text)
+
+            print()
+
+            # ---- Error case (division by zero) ----
+            result2 = await session.call_tool("divide", arguments={"a": 10, "b": 0})
+            print("divide(10, 0) -> isError:", result2.isError)
+            print("Content:", result2.content[0].text)
+
+            print()
+
+            # ---- Using isError in real code (like an AI agent would) ----
+            result3 = await session.call_tool("square_root", arguments={"number": -9})
+            if result3.isError:
+                print("⚠️ Tool call failed! Reason:", result3.content[0].text)
+            else:
+                print("✅ Tool succeeded:", result3.content[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
