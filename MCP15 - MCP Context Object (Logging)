@@ -1,0 +1,58 @@
+📚 MCP Context Object (Logging)
+🎯 What is the Context Object in MCP?
+
+The Context Object is a special object that the MCP server passes to your tool or handler. It contains useful information about the current request and provides helper methods, such as logging, reporting progress, or sending notifications (depending on the SDK).
+
+Simple Definition:
+
+The Context Object is like an assistant for your MCP code. It gives you extra information about the request and lets you communicate with the MCP client.
+
+🏠 Real-Life Analogy
+
+Imagine you're a delivery driver.
+
+You don't just receive the package—you also receive a delivery sheet containing:
+
+Customer details
+Delivery instructions
+Contact number
+Status updates
+
+That delivery sheet is similar to the Context Object.
+
+Delivery Driver
+      │
+      ▼
+Delivery Sheet (Context)
+      │
+Contains useful information
+      │
+Helps complete the delivery
+🤔 Why Do We Need a Context Object?
+
+Without a context object, your function can only process inputs and return outputs.
+
+With a context object, it can also:
+
+Write logs
+Report progress
+Send notifications
+Access request-related information
+Debug problems more easily
+
+This makes your MCP server easier to monitor and maintain.
+
+🧠 What is Logging?
+
+Logging means recording messages about what your program is doing.
+
+Instead of printing messages to the terminal, you create structured log entries that help developers understand what happened during execution.
+
+
+
+Context Object is passed to MCP handlers and provides helper functionality.
+One of its most common uses is logging.
+Logging records the execution of your tool for debugging and monitoring.
+Use appropriate log levels like Debug, Info, Warning, and Error.
+Never log confidential or sensitive information.
+Good logging makes MCP servers much easier to troubleshoot and maintain.
